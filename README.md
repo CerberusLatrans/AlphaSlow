@@ -1,17 +1,6 @@
-# RLBotPythonExample
-Example of a Python bot using the RLBot framework
-
-## Quick Start
-The easiest way to start a Python bot is demonstrated here!
-https://youtu.be/YJ69QZ-EX7k
-
-It shows you how to:
-- Install the RLBot GUI
-- Use it to create a new bot
-
-## Changing the bot
-
-- Bot behavior is controlled by `src/bot.py`
-- Bot appearance is controlled by `src/appearance.cfg`
-
-See https://github.com/RLBot/RLBotPythonExample/wiki for documentation and tutorials.
+Ok so this is my first github repo and I made the repo in the wrong folder.
+So in order to get to the AlphaSlow files, go to src.
+From there, the bot consists of 3 files:
+  AlphaSlow.py to play the game using the parameters from parameters.py, 
+  Training.py to train the neural network
+  parameters.py to store the parameters from training.py
