@@ -112,11 +112,11 @@ class AlphaSlow(BaseAgent):
         rotator_val(own_car.physics.rotation, ['car_rotation_pitch', 'car_rotation_yaw', 'car_rotation_roll'])
         vector_val(own_car.physics.velocity, ['car_velocity_x', 'car_velocity_y', 'car_velocity_z'])
         vector_val(own_car.physics.angular_velocity, ['car_angular_velocity_x', 'car_angular_velocity_y', 'car_angular_velocity_z'])
-        bool_to_int_val(own_car.is_demolished, 'demo_state')
-        bool_to_int_val(own_car.has_wheel_contact, 'wheel_contact')
-        bool_to_int_val(own_car.is_super_sonic, 'super_sonic')
-        bool_to_int_val(own_car.jumped, 'jumped')
-        bool_to_int_val(own_car.double_jumped, 'double_jumped')
+        #bool_to_int_val(own_car.is_demolished, 'demo_state')
+        #bool_to_int_val(own_car.has_wheel_contact, 'wheel_contact')
+        #bool_to_int_val(own_car.is_super_sonic, 'super_sonic')
+        #bool_to_int_val(own_car.jumped, 'jumped')
+        #bool_to_int_val(own_car.double_jumped, 'double_jumped')
 
         own_boost_amount = (own_car.boost)
         inputs.append(own_boost_amount)
@@ -125,21 +125,21 @@ class AlphaSlow(BaseAgent):
         rotator_val(opp_car.physics.rotation, ['car_rotation_pitch', 'car_rotation_yaw', 'car_rotation_roll'])
         vector_val(opp_car.physics.velocity, ['car_velocity_x', 'car_velocity_y', 'car_velocity_z'])
         vector_val(opp_car.physics.angular_velocity, ['car_angular_velocity_x', 'car_angular_velocity_y', 'car_angular_velocity_z'])
-        bool_to_int_val(opp_car.is_demolished, 'demo_state')
-        bool_to_int_val(opp_car.has_wheel_contact, 'wheel_contact')
-        bool_to_int_val(opp_car.is_super_sonic, 'super_sonic')
-        bool_to_int_val(opp_car.jumped, 'jumped')
-        bool_to_int_val(opp_car.double_jumped, 'double_jumped')
+        #bool_to_int_val(opp_car.is_demolished, 'demo_state')
+        #bool_to_int_val(opp_car.has_wheel_contact, 'wheel_contact')
+        #bool_to_int_val(opp_car.is_super_sonic, 'super_sonic')
+        #bool_to_int_val(opp_car.jumped, 'jumped')
+        #bool_to_int_val(opp_car.double_jumped, 'double_jumped')
 
         opp_boost_amount = (opp_car.boost)
         inputs.append(opp_boost_amount)
 
         "game boosts"
-        boost_pad = packet.game_boosts
+        #boost_pad = packet.game_boosts
 
-        for pad in range(34):
-            bool_to_int_val(boost_pad[pad].is_active, 'pad_' + str(pad+1) + '_bool')
-            int_to_int_val(boost_pad[pad].timer, 'pad_' + str(pad+1) + '_timer')
+        #for pad in range(34):
+            #bool_to_int_val(boost_pad[pad].is_active, 'pad_' + str(pad+1) + '_bool')
+            #int_to_int_val(boost_pad[pad].timer, 'pad_' + str(pad+1) + '_timer')
 
         "game ball"
         ball = packet.game_ball
@@ -147,35 +147,35 @@ class AlphaSlow(BaseAgent):
         vector_val(ball.physics.location, ['ball_location_x', 'ball_location_y', 'ball_location_z'])
         rotator_val(ball.physics.rotation, ['ball_rotation_pitch', 'ball_rotation_yaw', 'ball_rotation_roll'])
         vector_val(ball.physics.velocity, ['ball_velocity_x', 'ball_velocity_y', 'ball_velocity_z'])
-        vector_val(ball.physics.angular_velocity, ['ball_angular_velocity_x', 'ball_angular_velocity_y', 'ball_angular_velocity_z'])
-        vector_val(ball.latest_touch.hit_location, ['ball_hit_location_x', 'ball_hit_location_y', 'ball_hit_location_z'])
-        vector_val(ball.latest_touch.hit_normal, ['ball_hit_normal_x', 'ball_hit_normal_y', 'ball_hit_normal_z'])
+        #vector_val(ball.physics.angular_velocity, ['ball_angular_velocity_x', 'ball_angular_velocity_y', 'ball_angular_velocity_z'])
+        #vector_val(ball.latest_touch.hit_location, ['ball_hit_location_x', 'ball_hit_location_y', 'ball_hit_location_z'])
+        #vector_val(ball.latest_touch.hit_normal, ['ball_hit_normal_x', 'ball_hit_normal_y', 'ball_hit_normal_z'])
 
-        time_since_last_touch = ball.latest_touch.time_seconds
-        inputs.append(time_since_last_touch)
+        #time_since_last_touch = ball.latest_touch.time_seconds
+        #inputs.append(time_since_last_touch)
 
-        last_touch_team = ball.latest_touch.team
-        inputs.append(last_touch_team)
+        #last_touch_team = ball.latest_touch.team
+        #inputs.append(last_touch_team)
 
         "game info"
         info = packet.game_info
 
-        bool_to_int_val(info.is_overtime, 'is_overtime')
-        bool_to_int_val(info.is_round_active, 'is_round_active')
-        bool_to_int_val(info.is_kickoff_pause, 'is_kickoff')
+        #bool_to_int_val(info.is_overtime, 'is_overtime')
+        #bool_to_int_val(info.is_round_active, 'is_round_active')
+        #bool_to_int_val(info.is_kickoff_pause, 'is_kickoff')
 
         time_elapsed = (info.seconds_elapsed)
         inputs.append(time_elapsed)
 
-        time_remaining = (info.game_time_remaining)
-        inputs.append(time_remaining)
+        #time_remaining = (info.game_time_remaining)
+        #inputs.append(time_remaining)
 
         "teams"
         own_team = packet.teams[self.team]
         opp_team = packet.teams[opponent_team]
 
-        score_diff = own_team.score - opp_team.score
-        inputs.append(score_diff)
+        #score_diff = own_team.score - opp_team.score
+        #inputs.append(score_diff)
 
 
         """TURNING PACKET INTO NETWORK FEATURE MATRIX"""
@@ -213,6 +213,8 @@ class AlphaSlow(BaseAgent):
         self.renderer.begin_rendering()
         self.renderer.draw_string_2d(0, 0, 1, 1, str(inputs), self.renderer.cyan())
         self.renderer.draw_string_2d(0, 20, 1, 1, str(len(inputs)), self.renderer.cyan())
+        self.renderer.draw_string_2d(0, 40, 1, 1, str(int((len(inputs)+8)/2)), self.renderer.cyan())
+        self.renderer.draw_string_2d(0, 60, 1, 1, str(len(output_vector)), self.renderer.cyan())
         self.renderer.end_rendering()
         """RENDERING TEXT TO DEBUG"""
         return controls

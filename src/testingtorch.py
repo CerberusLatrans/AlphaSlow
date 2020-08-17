@@ -1,40 +1,32 @@
-
+import sys
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import os
 
 
-tup_in_list=[("me", 1), ("you", 2), ("him",3)]
+print(os.listdir(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src"))
+import createTrainingData
+print(os.path.exists(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays"))
+print("OK")
+print(os.path.isfile(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays"))
+print(os.access(r'C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays', os.R_OK))
+print(os.access(r'C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays', os.W_OK))
+print(os.access(r'C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays', os.X_OK))
+print(os.access(r'C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays', os.F_OK))
+print(os.stat(r'C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays'))
+#open(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays")
+#open(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays",encoding='utf-8', errors='ignore')
 
-print(tup_in_list[0][0])
+print("TESTING LOCAL PATH")
+print(os.path.exists(r"\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\json_replays"))
+print("OK")
+print(os.path.isfile(r"json_replays"))
+print(os.access(r'json_replays', os.R_OK))
+print(os.access(r'json_replays', os.W_OK))
+print(os.access(r'json_replays', os.X_OK))
+print(os.access(r'json_replays', os.F_OK))
 
-list = [0.75, 0.73, 98, 4.5, 23.1, 0.69, 0.93]
-
-#VEC3  Notes
-#A= Vec3
-
-#A = no error
-#Vec3(A) = could not convert string to float
-#A[0] = Vector 3 object not subscriptable
-#list(A) = Vector 3 object is not iterable
-#tuple(A) = Vector 3 object is not iterable
-#A['x'] = vector 3 object is not subscriptable
-#A.x = NO ERROR :)
-
-#rotator and vec3 are two different types of objects
-
-v = torch.empty(10,10)
-print(v)
-nn.init.uniform_(v)
-print(v)
-
-print(torch.Tensor(5))
-print(len(torch.Tensor(5)))
-
-pear = 3
-print("apple" + str(1+pear))
-
-
-for a in range(10):
-    print(a)
+print('TESTING ABS PATH')
+print(os.path.abspath(r'Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src\replays_replays'))
