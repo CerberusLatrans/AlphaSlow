@@ -5,6 +5,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 import os
 
+print(os.path.abspath(r"1.replay"))
 
 print(os.listdir(r"C:\Users\ollie\AppData\Local\RLBotGUIX\MyBots\AlphaSlow\src"))
 import createTrainingData
