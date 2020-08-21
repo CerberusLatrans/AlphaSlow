@@ -147,7 +147,7 @@ class AlphaSlow(BaseAgent):
         vector_val(ball.physics.location, ['ball_location_x', 'ball_location_y', 'ball_location_z'])
         rotator_val(ball.physics.rotation, ['ball_rotation_pitch', 'ball_rotation_yaw', 'ball_rotation_roll'])
         vector_val(ball.physics.velocity, ['ball_velocity_x', 'ball_velocity_y', 'ball_velocity_z'])
-        #vector_val(ball.physics.angular_velocity, ['ball_angular_velocity_x', 'ball_angular_velocity_y', 'ball_angular_velocity_z'])
+        vector_val(ball.physics.angular_velocity, ['ball_angular_velocity_x', 'ball_angular_velocity_y', 'ball_angular_velocity_z'])
         #vector_val(ball.latest_touch.hit_location, ['ball_hit_location_x', 'ball_hit_location_y', 'ball_hit_location_z'])
         #vector_val(ball.latest_touch.hit_normal, ['ball_hit_normal_x', 'ball_hit_normal_y', 'ball_hit_normal_z'])
 
@@ -164,8 +164,8 @@ class AlphaSlow(BaseAgent):
         #bool_to_int_val(info.is_round_active, 'is_round_active')
         #bool_to_int_val(info.is_kickoff_pause, 'is_kickoff')
 
-        time_elapsed = (info.seconds_elapsed)
-        inputs.append(time_elapsed)
+        #time_elapsed = (info.seconds_elapsed)
+        #inputs.append(time_elapsed)
 
         #time_remaining = (info.game_time_remaining)
         #inputs.append(time_remaining)

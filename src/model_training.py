@@ -169,5 +169,5 @@ for i in range(epochs):
 parameter_file = (src_path + r"parameters.txt", "w+")
 for param in model.parameters():
   print(param.data)
-  parameter_file.write(param.data)
+  parameter_file.write(str(param.data))
 print("TRAINING COMPLETE YIPPEY")
