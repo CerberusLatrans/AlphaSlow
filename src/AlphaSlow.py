@@ -16,16 +16,31 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
+import os
+import re
+
+src_path = os.path.abspath("") + "\\" + "src" + "\\"
+with open(src_path + "parameters.txt", "r") as file:
+    parameters = file.read().replace('\n', '')
+    param_lists = re.findall("\[\[.+?\]\]", parameters)
+    fc1_param_list = eval(param_lists[0])
+    fc2_param_list = eval(param_lists[1])
+    fc1_param_tensor = torch.nn.Parameter(torch.Tensor(fc1_param_list))
+    fc2_param_tensor = torch.nn.Parameter(torch.Tensor(fc2_param_list))
 
 """recreate network class here to instantiate and use in Alphaslow agent"""
 class NeuralNet(nn.Module):
     def __init__(self, n_in, n_mid, n_out):
         super(NeuralNet, self).__init__()
-        self.fc1 = nn.Linear(n_in, n_mid)
-        self.fc2 = nn.Linear(n_mid, n_out)
+        self.fc1 = nn.Linear(n_in, n_mid, bias = True)
+        self.fc2 = nn.Linear(n_mid, n_out, bias = True)
 
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
+
+        with torch.no_grad():
+            self.fc1.weight = fc1_param_tensor
+            self.fc2.weight = fc2_param_tensor
 
     def forward(self, inputs):
         outputs = self.sigmoid(self.fc1(inputs))
@@ -211,10 +226,13 @@ class AlphaSlow(BaseAgent):
             controls.handbrake = False
         """RENDERING TEXT TO DEBUG"""
         self.renderer.begin_rendering()
-        self.renderer.draw_string_2d(0, 0, 1, 1, str(inputs), self.renderer.cyan())
-        self.renderer.draw_string_2d(0, 20, 1, 1, str(len(inputs)), self.renderer.cyan())
-        self.renderer.draw_string_2d(0, 40, 1, 1, str(int((len(inputs)+8)/2)), self.renderer.cyan())
-        self.renderer.draw_string_2d(0, 60, 1, 1, str(len(output_vector)), self.renderer.cyan())
+        self.renderer.draw_string_2d(0, 0, 1, 1, str(inputs[:13]), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 80, 1, 1, str(inputs[13:26]), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 160, 1, 1, str(inputs[26:]), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 200, 1, 1, str(len(inputs)), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 220, 1, 1, str(int((len(inputs)+8)/2)), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 240, 1, 1, str(len(output_vector)), self.renderer.yellow())
+        self.renderer.draw_string_2d(0, 260, 1, 1, str(src_path), self.renderer.yellow())
         self.renderer.end_rendering()
         """RENDERING TEXT TO DEBUG"""
         return controls

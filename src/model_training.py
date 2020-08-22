@@ -91,7 +91,7 @@ for replay_file in raw_replays:
 
     #replacing boolean with 1s and 0s
     labels.replace(to_replace = True, value = 1, inplace = True)
-    labels.replace(to_replace = False, value = 0, inplace = True)
+    labels.replace(to_replace = False, value = -1, inplace = True)
 
     #replaces NaN with zeroes
     labels.fillna(0, inplace = True)
@@ -101,7 +101,7 @@ for replay_file in raw_replays:
     if raw_replays.index(replay_file) == 0:
         labels.to_csv(src_path + r"labels.csv", header = True)
     else:
-        labels.to_csv(src_path + r"labels.csv", header = False, mode = 'a')
+        labels.to_csv(src_path + r"labels.csv", header = False, mode = 'w')
 
 n_in = 38
 n_mid = int((n_in + 8)/2)
@@ -114,8 +114,8 @@ n_out = 8
 class AlphaSlow(nn.Module):
     def __init__(self, n_in, n_mid, n_out):
         super(AlphaSlow, self).__init__()
-        self.fc1 = nn.Linear(n_in, n_mid)
-        self.fc2 = nn.Linear(n_mid, n_out)
+        self.fc1 = nn.Linear(n_in, n_mid, bias = True)
+        self.fc2 = nn.Linear(n_mid, n_out, bias = True)
 
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
@@ -130,7 +130,7 @@ model = AlphaSlow(n_in, n_mid, n_out)
 '######################################################'
 '3. Loss Function'
 '######################################################'
-loss = nn.HingeEmbeddingLoss()
+loss = nn.MSELoss()
 learning_rate = 1e-2
 
 '######################################################'
@@ -139,7 +139,7 @@ learning_rate = 1e-2
 opt = optim.SGD(model.parameters(), lr=learning_rate)
 
 '######################################################'
-'5. Minibatch iteration'
+'5. Iteration'
 '######################################################'
 epochs = 10
 
@@ -162,12 +162,13 @@ for i in range(epochs):
         opt.step()
 
         #printing the loss every iteration
-        #if index %9000 == 0:
-            #print('SAMPLE: ', index)
-            #print("LOSS: ", J)
+        if index %100 == 0:
+            print('SAMPLE: ', index)
+            print("LOSS: ", J)
 
-parameter_file = (src_path + r"parameters.txt", "w+")
+parameter_file = (src_path + r"parameters.txt")
 for param in model.parameters():
-  print(param.data)
-  parameter_file.write(str(param.data))
+    print(param.data, param.data.size())
+    with open(parameter_file, "a") as out:
+        out.write(str(param.data))
 print("TRAINING COMPLETE YIPPEY")
