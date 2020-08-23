@@ -30,12 +30,19 @@ replay_path = os.path.abspath("raw_replays") + "\\"
 replay_files = os.listdir(replay_path)
 #print(replay_files)
 
+features_file = (src_path + r"features.csv")
+out_features = open(features_file, "a+")
+out_features.truncate(0)
+
+labels_file = (src_path + r"labels.csv")
+out_labels = open(labels_file, "a+")
+out_labels.truncate(0)
+
 for i in replay_files:
     replay_file = replay_path + i
     raw_replays.append(replay_file)
 
 #print(raw_replays)
-
 for replay_file in raw_replays:
     json_data = carball.decompile_replay(replay_file)
 
@@ -47,7 +54,7 @@ for replay_file in raw_replays:
     df = analysis.get_data_frame()
 
     """
-    CREATING FEATURE DATA as X_tensor and loading it into featuresc.csv
+    CREATING FEATURE DATA as X_tensor and loading it into features.csv
     """
 
     player_1 = df.columns[0][0]
@@ -77,9 +84,9 @@ for replay_file in raw_replays:
     #if the first file, keep header and dont append to csv file
     #after the first file, don't keep header and append to csv file at the end of the last replay data
     if raw_replays.index(replay_file) == 0:
-        features.to_csv(src_path + r"features.csv", header = True)
+        features.to_csv(src_path + r"features.csv", header = True, index = False)
     else:
-        features.to_csv(src_path + r"features.csv", header = False, mode = 'a')
+        features.to_csv(src_path + r"features.csv", header = False, index = False, mode = 'a')
 
     """
     CREATING LABEL DATA as Y_tensor and loading it into labels.csv
@@ -99,9 +106,9 @@ for replay_file in raw_replays:
     #print(labels)
 
     if raw_replays.index(replay_file) == 0:
-        labels.to_csv(src_path + r"labels.csv", header = True)
+        labels.to_csv(src_path + r"labels.csv", header = True, index = False)
     else:
-        labels.to_csv(src_path + r"labels.csv", header = False, mode = 'w')
+        labels.to_csv(src_path + r"labels.csv", header = False, index = False, mode = 'a')
 
 n_in = 38
 n_mid = int((n_in + 8)/2)
@@ -131,7 +138,7 @@ model = AlphaSlow(n_in, n_mid, n_out)
 '3. Loss Function'
 '######################################################'
 loss = nn.MSELoss()
-learning_rate = 1e-2
+learning_rate = 1e-1
 
 '######################################################'
 '4. Optimization Algorithm (SGD)'
@@ -141,34 +148,60 @@ opt = optim.SGD(model.parameters(), lr=learning_rate)
 '######################################################'
 '5. Iteration'
 '######################################################'
-epochs = 10
+epochs = 1
 
 # an empty list to collect the training loss (used for graphing)
 J_train_all = []
-# an empty list to collect the testing loss (used for graphing)
-J_test_all = []
 
-#for every one of the epochs:
-for i in range(epochs):
-    #iterate through each frame sample (of all replays which are concatenated in the X tensor)
-    for index,sample in features.iterrows():
-        X_tensor = torch.tensor(sample.values).float()
-        Y_tensor = torch.tensor(labels.loc[index, :].values).float()
-        model.train()
-        opt.zero_grad()
-        y_hat = model(X_tensor)
-        J = loss(y_hat, Y_tensor)
-        J.backward()
-        opt.step()
+features_data_raw = pd.read_csv(src_path + 'features.csv')
+features_data = features_data_raw.values[1:]
+features_data = np.array(features_data, dtype = np.float32)
+all_features_tensor = torch.from_numpy(features_data)
+print(all_features_tensor.shape)
 
-        #printing the loss every iteration
-        if index %100 == 0:
-            print('SAMPLE: ', index)
-            print("LOSS: ", J)
+labels_data_raw = pd.read_csv(src_path + 'labels.csv')
+labels_data = labels_data_raw.values[0:]
+labels_data = np.array(labels_data, dtype = np.float32)
+all_labels_tensor = torch.from_numpy(labels_data)
+print(all_labels_tensor.shape)
+
+J = 1
+while J > 0.290:
+    #for every one of the epochs:
+    for i in range(epochs):
+        #iterate through each frame sample (of all replays which are concatenated in the X tensor)
+        for index,sample in features_data_raw.iterrows():
+            model.train()
+            opt.zero_grad()
+            y_hat = model(all_features_tensor)
+            J = loss(y_hat, all_labels_tensor)
+            J.backward()
+            opt.step()
+
+            #adding loss to list to be graphed every iteration
+            J_train_all.append(J)
+
+            if index % 1 == 0:
+                print('SAMPLE: ', index)
+                print("LOSS: ", J)
+            elif index == all_features_tensor.shape[0]:
+                print('SAMPLE: ', index)
+                print("LOSS: ", J)
 
 parameter_file = (src_path + r"parameters.txt")
+out = open(parameter_file, "a+")
+out.truncate(0)
+
 for param in model.parameters():
     print(param.data, param.data.size())
-    with open(parameter_file, "a") as out:
-        out.write(str(param.data))
+    out.write(str(param.data))
+
 print("TRAINING COMPLETE YIPPEY")
+
+"""
+GRAPHING LOSS OVER ITERATION
+"""
+plt.plot(J_train_all)
+plt.ylabel('LOSS')
+plt.xlabel('# OF SAMPLES')
+plt.show()
