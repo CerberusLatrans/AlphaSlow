@@ -20,33 +20,89 @@ import os
 import re
 
 src_path = os.path.abspath("") + "\\" + "src" + "\\"
-with open(src_path + "parameters.txt", "r") as file:
+
+#with open(src_path + "FINAL_PARAMETERS.txt", "r") as file:
+with open(src_path + "FINAL_PARAMETERS.txt", "r") as file:
     parameters = file.read().replace('\n', '')
-    param_lists = re.findall("\[\[.+?\]\]", parameters)
-    fc1_param_list = eval(param_lists[0])
-    fc2_param_list = eval(param_lists[1])
-    fc1_param_tensor = torch.nn.Parameter(torch.Tensor(fc1_param_list))
-    fc2_param_tensor = torch.nn.Parameter(torch.Tensor(fc2_param_list))
+    param_lists = re.findall("\(\[.+?\]\)", parameters)
+
+    fc1_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[0].strip("()"))))
+    fc1_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[1].strip("()"))))
+
+    fc2_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[2].strip("()"))))
+    fc2_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[3].strip("()"))))
+
+    fc3_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[4].strip("()"))))
+    fc3_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[5].strip("()"))))
+
+    fc4_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[6].strip("()"))))
+    fc4_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[7].strip("()"))))
+
+    fc5_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[8].strip("()"))))
+    fc5_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[9].strip("()"))))
+
+    fc6_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[10].strip("()"))))
+    fc6_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[11].strip("()"))))
+
+    fc7_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[12].strip("()"))))
+    fc7_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[13].strip("()"))))
+
+    fc8_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[14].strip("()"))))
+    fc8_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[15].strip("()"))))
+
+    fc9_weight_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[16].strip("()"))))
+    fc9_bias_tensor = torch.nn.Parameter(torch.Tensor(eval(param_lists[17].strip("()"))))
 
 """recreate network class here to instantiate and use in Alphaslow agent"""
 class NeuralNet(nn.Module):
-    def __init__(self, n_in, n_mid, n_out):
+    def __init__(self, n_in, n_out):
         super(NeuralNet, self).__init__()
-        self.fc1 = nn.Linear(n_in, n_mid, bias = True)
-        self.fc2 = nn.Linear(n_mid, n_out, bias = True)
+        self.fc1 = nn.Linear(n_in, 160, bias = True)
+        self.fc2 = nn.Linear(160, 160, bias = True)
+        self.fc3 = nn.Linear(160, 80, bias = True)
+        self.fc4 = nn.Linear(80, 80, bias = True)
+        self.fc5 = nn.Linear(80, 40, bias = True)
+        self.fc6 = nn.Linear(40, 40, bias = True)
+        self.fc7 = nn.Linear(40, 20, bias = True)
+        self.fc8 = nn.Linear(20, 20, bias = True)
+        self.fc9 = nn.Linear(20, n_out, bias = True)
 
         self.sigmoid = nn.Sigmoid()
-        self.tanh = nn.Tanh()
+        self.Tanh = nn.Tanh()
+        self.ReLU = nn.ReLU()
 
         with torch.no_grad():
-            self.fc1.weight = fc1_param_tensor
-            self.fc2.weight = fc2_param_tensor
+            self.fc1.weight = fc1_weight_tensor
+            self.fc1.bias = fc1_bias_tensor
+            self.fc2.weight = fc2_weight_tensor
+            self.fc2.bias = fc2_bias_tensor
+            self.fc3.weight = fc3_weight_tensor
+            self.fc3.bias = fc3_bias_tensor
+            self.fc4.weight = fc4_weight_tensor
+            self.fc4.bias = fc4_bias_tensor
+            self.fc5.weight = fc5_weight_tensor
+            self.fc5.bias = fc5_bias_tensor
+            self.fc6.weight = fc6_weight_tensor
+            self.fc6.bias = fc6_bias_tensor
+            self.fc7.weight = fc7_weight_tensor
+            self.fc7.bias = fc7_bias_tensor
+            self.fc8.weight = fc8_weight_tensor
+            self.fc8.bias = fc8_bias_tensor
+            self.fc9.weight = fc9_weight_tensor
+            self.fc9.bias = fc9_bias_tensor
 
     def forward(self, inputs):
-        outputs = self.sigmoid(self.fc1(inputs))
-        outputs = self.tanh(self.fc2(outputs))
-        return outputs
+        outputs = self.ReLU(self.fc1(inputs))
+        outputs = self.ReLU(self.fc2(outputs))
+        outputs = self.ReLU(self.fc3(outputs))
+        outputs = self.ReLU(self.fc4(outputs))
+        outputs = self.ReLU(self.fc5(outputs))
+        outputs = self.ReLU(self.fc6(outputs))
+        outputs = self.ReLU(self.fc7(outputs))
+        outputs = self.ReLU(self.fc8(outputs))
+        outputs = self.Tanh(self.fc9(outputs))
 
+        return outputs
 
 class AlphaSlow(BaseAgent):
     def __init__(self, name, team, index):
@@ -192,6 +248,52 @@ class AlphaSlow(BaseAgent):
         #score_diff = own_team.score - opp_team.score
         #inputs.append(score_diff)
 
+        """NORMALIZING INPUTS"""
+        def norm(inputs, column, min, max):
+            new_value = (inputs[column] - min) /  (max - min)
+            inputs[column] = new_value
+            return inputs
+
+        norm(inputs, 0, -4096, 4096)
+        norm(inputs, 1, -4096, 4096)
+        norm(inputs, 2, 0, 2044)
+        norm(inputs, 3, -math.pi/2, math.pi/2)
+        norm(inputs, 4, -math.pi, math.pi)
+        norm(inputs, 5, -math.pi, math.pi)
+        norm(inputs, 6, -2300, 2300)
+        norm(inputs, 7, -2300, 2300)
+        norm(inputs, 8, -2300, 2300)
+        norm(inputs, 9, -5500, 5500)
+        norm(inputs, 10, -5.5, 5.5)
+        norm(inputs, 11, -5.5, 5.5)
+        norm(inputs, 12, 0, 100)
+
+        norm(inputs, 13, -4096, 4096)
+        norm(inputs, 14, -4096, 4096)
+        norm(inputs, 15, 0, 2044)
+        norm(inputs, 16, -math.pi/2, math.pi/2)
+        norm(inputs, 17, -math.pi, math.pi)
+        norm(inputs, 18, -math.pi, math.pi)
+        norm(inputs, 19, -2300, 2300)
+        norm(inputs, 20, -2300, 2300)
+        norm(inputs, 21, -2300, 2300)
+        norm(inputs, 22, -5.5, 5.5)
+        norm(inputs, 23, -5.5, 5.5)
+        norm(inputs, 24, -5.5, 5.5)
+        norm(inputs, 25, 0, 100)
+
+        norm(inputs, 26, -4096, 4096)
+        norm(inputs, 27, -4096, 4096)
+        norm(inputs, 28, 0, 2044)
+        norm(inputs, 29, -math.pi/2, math.pi/2)
+        norm(inputs, 30, -math.pi, math.pi)
+        norm(inputs, 31, -math.pi, math.pi)
+        norm(inputs, 32, -6000, 6000)
+        norm(inputs, 33, -6000, 6000)
+        norm(inputs, 34, -6000, 6000)
+        norm(inputs, 35, -6, 6)
+        norm(inputs, 36, -6, 6)
+        norm(inputs, 37, -6, 6)
 
         """TURNING PACKET INTO NETWORK FEATURE MATRIX"""
         inputs = torch.Tensor(inputs).float()
@@ -199,7 +301,7 @@ class AlphaSlow(BaseAgent):
         """IN PROGRESS- need to regularize inputs"""
 
         """PROPAGATING FEATURES THROUGH NETWORK TO GET CONTROLS OUTPUT"""
-        model = NeuralNet(len(inputs), int((len(inputs)+8)/2), 8)
+        model = NeuralNet(len(inputs), 8)
         output_vector = model(inputs)
         output_vector = list(output_vector)
 
